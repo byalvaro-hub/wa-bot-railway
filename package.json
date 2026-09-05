@@ -1,0 +1,16 @@
+{
+  "name": "wa-bot-railway",
+  "version": "2.0.0",
+  "description": "Bot WhatsApp with .menu and all features",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.0",
+    "qrcode-terminal": "^0.12.0",
+    "express": "^4.18.2",
+    "axios": "^1.6.0",
+    "ytdl-core": "^4.11.0"
+  }
+}
