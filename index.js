@@ -2,6 +2,7 @@ const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysocket
 const express = require('express');
 const axios = require('axios');
 const ytdl = require('ytdl-core');
+const crypto = require('crypto');  // ← INI PENTING!
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -67,7 +68,6 @@ async function startBot() {
           const info = await ytdl.getInfo(url);
           const title = info.videoDetails.title;
           await sock.sendMessage(jid, { text: `🎬 Downloading: ${title}` });
-          // Kirim audio/video (kode lengkapnya panjang, tapi intinya gini)
         } catch (e) {
           await sock.sendMessage(jid, { text: '❌ Link YT invalid!' });
         }
@@ -76,7 +76,6 @@ async function startBot() {
       else if (text.startsWith('.ig ')) {
         const url = text.replace('.ig ', '');
         await sock.sendMessage(jid, { text: `📥 Download IG dari: ${url}` });
-        // Pake API eksternal buat download IG
       }
 
       else if (text.startsWith('.tt ')) {
@@ -86,8 +85,7 @@ async function startBot() {
 
       // ======== GAME ======== //
       else if (text === '.tebak') {
-        const game = 'Tebak kata: "Aku punya sisik, aku hidup di air" - Jawab: I_K_N (huruf hilang)';
-        await sock.sendMessage(jid, { text: game });
+        await sock.sendMessage(jid, { text: '🎮 Tebak kata: "Aku punya sisik, aku hidup di air" - Jawab: I_K_N' });
       }
 
       else if (text === '.leaderboard') {
@@ -96,19 +94,31 @@ async function startBot() {
 
       // ======== GRUP ======== //
       else if (text === '.hidetag') {
-        const groupMetadata = await sock.groupMetadata(jid);
-        const participants = groupMetadata.participants.map(p => p.id);
-        await sock.sendMessage(jid, { text: '🔔 @all', mentions: participants });
+        try {
+          const groupMetadata = await sock.groupMetadata(jid);
+          const participants = groupMetadata.participants.map(p => p.id);
+          await sock.sendMessage(jid, { text: '🔔 @all', mentions: participants });
+        } catch (e) {
+          await sock.sendMessage(jid, { text: '❌ Gagal hidetag! Bot bukan admin?' });
+        }
       }
 
       else if (text === '.close') {
-        await sock.groupSettingUpdate(jid, 'announcement');
-        await sock.sendMessage(jid, { text: '🔒 Grup ditutup!' });
+        try {
+          await sock.groupSettingUpdate(jid, 'announcement');
+          await sock.sendMessage(jid, { text: '🔒 Grup ditutup!' });
+        } catch (e) {
+          await sock.sendMessage(jid, { text: '❌ Gagal tutup grup!' });
+        }
       }
 
       else if (text === '.open') {
-        await sock.groupSettingUpdate(jid, 'not_announcement');
-        await sock.sendMessage(jid, { text: '🔓 Grup dibuka!' });
+        try {
+          await sock.groupSettingUpdate(jid, 'not_announcement');
+          await sock.sendMessage(jid, { text: '🔓 Grup dibuka!' });
+        } catch (e) {
+          await sock.sendMessage(jid, { text: '❌ Gagal buka grup!' });
+        }
       }
 
       // ======== LAINNYA ======== //
